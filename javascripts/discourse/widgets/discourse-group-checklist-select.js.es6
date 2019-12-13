@@ -7,9 +7,9 @@ export default createWidget("discourse-group-checklist-select", {
 
   change(event) {
     const value = event.target.value;
-    this.sendWidgetAction("onChangeSelect", {
+    this.sendWidgetAction("handleUser", {
       username: this.attrs.user.username,
-      value: value === "__none__" ? null : value
+      value: value === "__none__" ? "" : value
     });
   },
 

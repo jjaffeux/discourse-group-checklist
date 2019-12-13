@@ -2,6 +2,7 @@ import { ajax } from "discourse/lib/ajax";
 import { cookAsync } from "discourse/lib/text";
 import hbs from "discourse/widgets/hbs-compiler";
 import { createWidget } from "discourse/widgets/widget";
+import markdownTable from "../lib/markdown-table";
 
 export default createWidget("discourse-group-checklist", {
   tagName: "div.discourse-group-checklist",
@@ -12,16 +13,13 @@ export default createWidget("discourse-group-checklist", {
     const users = attrs.members
       .map(member => {
         const checkedUser = attrs.checkedUsers.find(
-          u => u.indexOf(member.username) === 0
+          u => u.username === member.username
         );
         member._checked = checkedUser;
-
         if (checkedUser) {
-          const value = checkedUser.split("|");
-
-          if (value && value[1]) member._value = value[1];
+          member._value = checkedUser.value;
+          member._description = checkedUser.description;
         }
-
         member._currentUser = attrs.currentUsername === member.username;
         return member;
       })
@@ -59,42 +57,22 @@ export default createWidget("discourse-group-checklist", {
     this.state.filter = filter && filter.length ? filter : null;
   },
 
-  onChangeSelect(data) {
+  handleUser(user) {
     const checkedUser = this.attrs.checkedUsers.find(
-      u => u.indexOf(data.username) === 0
+      u => u.username === user.username
     );
 
-    console.log(data, checkedUser)
-
-    if (!data.value && checkedUser) {
+    if (!user.value && checkedUser) {
       this.attrs.checkedUsers.removeObject(checkedUser);
     } else {
-      const payload = [data.username, data.value].filter(Boolean);
       if (checkedUser) {
         const index = this.attrs.checkedUsers.indexOf(checkedUser);
-        this.attrs.checkedUsers.replace(index, 1, [payload.join("|")]);
+        user.description = checkedUser.description || "";
+        this.attrs.checkedUsers.replace(index, 1, [user]);
       } else {
-
-        this.attrs.checkedUsers.pushObject(payload.join("|"));
+        user.description = "";
+        this.attrs.checkedUsers.pushObject(user);
       }
-    }
-
-    this._update();
-  },
-
-  toggleUser(user) {
-    const checkedUser = this.attrs.checkedUsers.find(
-      u => u.indexOf(user.username) === 0
-    );
-
-    if (checkedUser) {
-      this.attrs.checkedUsers.removeObject(checkedUser);
-    } else {
-      const payload = [user.username];
-      if (user._value) {
-        payload.push(user._value);
-      }
-      this.attrs.checkedUsers.pushObject(payload.join("|"));
     }
 
     this._update();
@@ -122,10 +100,16 @@ export default createWidget("discourse-group-checklist", {
           "gmsi"
         );
 
+        const data = [];
+        data.push(["user", "value", "description"]);
+        this.attrs.checkedUsers.forEach(u =>
+          data.push([u.username, u.value, u.description])
+        );
+        const table = markdownTable(data);
         const newRaw = result.raw.replace(
           regex,
           (match, before, capture, after) => {
-            return `${before}\n${this.attrs.checkedUsers.join("\n")}\n${after}`;
+            return `${before}\n${table}\n${after}`;
           }
         );
 

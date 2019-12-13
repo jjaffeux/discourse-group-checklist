@@ -49,10 +49,25 @@ export default {
           return;
         }
 
+        const checkedUsers = [];
         $groupChecklists.each((idx, groupChecklist) => {
-          const checkedUsers = groupChecklist.innerText
-            .split("\n")
-            .filter(Boolean);
+          groupChecklist.querySelectorAll("tbody tr").forEach(tr => {
+            const checkedUser = {};
+            tr.querySelectorAll("td").forEach((td, index) => {
+              switch (index) {
+                case 0:
+                  checkedUser.username = td.innerText.trim();
+                  break;
+                case 1:
+                  checkedUser.value = td.innerText.trim();
+                  break;
+                case 2:
+                  checkedUser.description = td.innerText.trim();
+                  break;
+              }
+            });
+            checkedUsers.push(checkedUser);
+          });
 
           const identifier = escapeExpression(
             groupChecklist.getAttribute("data-identifier")

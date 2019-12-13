@@ -51,22 +51,27 @@ export default createWidget("discourse-group-checklist-user", {
 
     let actionComponent;
     if (this.attrs.choices.length) {
-      actionComponent = this.attach(
-        "discourse-group-checklist-select",
-        {
-          user: this.attrs.user,
-          choices: this.attrs.choices
-        }
-      );
+      actionComponent = this.attach("discourse-group-checklist-select", {
+        user: this.attrs.user,
+        choices: this.attrs.choices
+      });
     } else {
       actionComponent = this.attach("button", {
         className: classNames.join(" "),
         icon: _checked ? "check-square" : "far-square",
-        action: "toggleUser",
-        actionParam: attrs.user
+        action: "handleUser",
+        actionParam: {
+          username: attrs.user.username,
+          value: "✅",
+          description: attrs.user._description
+        }
       });
     }
 
-    return [h("td.user", [userNode]), h("td", [actionComponent]), h("td")];
+    return [
+      h("td.user", [userNode]),
+      h("td.value", [actionComponent]),
+      h("td.description", this.attrs.user._description)
+    ];
   }
 });
