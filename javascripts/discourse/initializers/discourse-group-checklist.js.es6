@@ -73,8 +73,7 @@ export default {
           );
 
           const choices = escapeExpression(
-            groupChecklist
-              .getAttribute("data-choices")
+            (groupChecklist.getAttribute("data-choices") || "")
               .split(",")
               .filter(Boolean)
           );
