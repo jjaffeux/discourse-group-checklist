@@ -39,7 +39,7 @@ export default createWidget("discourse-group-checklist-user", {
         }),
         h(
           "span.discourse-group-checklist-username",
-          `@${formatUsername(username)}`
+          formatUsername(username)
         )
       ]
     );
