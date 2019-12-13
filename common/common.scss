@@ -1,0 +1,39 @@
+.d-wrap[data-wrap="group-checklist"],
+.discourse-group-checklist {
+  border: 1px solid $primary-low;
+  height: 400px;
+  overflow-y: auto;
+
+  table {
+    table-layout: fixed ;
+    width: 100% ;
+
+    thead {
+      margin: 0.5em;
+    }
+
+    .widget-button {
+      background: none;
+
+      &:hover {
+        background: none;
+      }
+    }
+  }
+  .discourse-group-checklist-title {
+    margin: 0;
+  }
+
+  .discourse-group-checklist-filter {
+    margin: 0;
+    width: 100%;
+  }
+
+  .discourse-group-checklist-user {
+    .discourse-group-checklist-user-avatar {
+      .discourse-group-checklist-username {
+        margin-left: 0.5em;
+      }
+    }
+  }
+}
