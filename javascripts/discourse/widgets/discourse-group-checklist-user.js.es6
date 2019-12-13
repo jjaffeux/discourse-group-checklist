@@ -9,8 +9,15 @@ export default createWidget("discourse-group-checklist-user", {
 
   transform(attrs) {},
 
+  buildClasses(attrs) {
+    if (attrs.user._currentUser) {
+      return "is-current-user"
+    }
+  },
+
   html(attrs) {
-    const { name, username, avatar_template, _checked } = attrs.user;
+    const { name, username, avatar_template, _checked, _currentUser
+ } = attrs.user;
 
     const userNode = h(
       "a",
@@ -29,8 +36,13 @@ export default createWidget("discourse-group-checklist-user", {
       ]
     );
 
+    const classNames = []
+    if (_checked) {
+      classNames.push("is-checked");
+    }
+
     const checkedButton = this.attach("button", {
-      className: _checked ? "is-checked" : "",
+      className: classNames.join(" "),
       icon: _checked ? "check-square" : "far-square",
       action: "toggleUser",
       actionParam: attrs.user

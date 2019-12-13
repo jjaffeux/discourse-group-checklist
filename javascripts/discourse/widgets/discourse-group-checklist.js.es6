@@ -8,12 +8,11 @@ export default createWidget("discourse-group-checklist", {
 
   buildKey: attrs => `discourse-group-checklist-${attrs.id}`,
 
-
-
   transform(attrs) {
     const users = attrs.members
       .map(member => {
         member._checked = attrs.checkedUsers.includes(member.username);
+        member._currentUser = attrs.currentUsername === member.username;
         return member;
       })
       .filter(member => {
@@ -30,7 +29,14 @@ export default createWidget("discourse-group-checklist", {
         }
       })
       .filter(Boolean)
-      .sortBy("_checked");
+      .sort((a, b) => {
+        if (a._currentUser) return -10;
+        if (b._currentUser) return 1;
+        if (a._checked && !b._checked) return 1;
+        if (!a._checked && b._checked) return -1;
+
+        return 0;
+      });
 
     return { users };
   },
@@ -62,29 +68,31 @@ export default createWidget("discourse-group-checklist", {
       this.attrs.checkedUsers.pushObject(user.username);
     }
 
-    ajax(`/posts/${post.id}`, { type: "GET", cache: false }).then(result => {
-      const regex = new RegExp(
-        `(.*\\[wrap=group\\-checklist.*?identifier=${
-          this.attrs.identifier
-        }.*?\\])(.*?)(\\[\\/wrap\\].*)`,
-        "gmsi"
-      );
+    ajax(`/posts/${post.id}`, { type: "GET", cache: false })
+      .then(result => {
+        const regex = new RegExp(
+          `(.*\\[wrap=group\\-checklist.*?identifier=${
+            this.attrs.identifier
+          }.*?\\])(.*?)(\\[\\/wrap\\].*)`,
+          "gmsi"
+        );
 
-      const newRaw = result.raw.replace(
-        regex,
-        (match, before, capture, after) => {
-          return `${before}\n${this.attrs.checkedUsers.join("\n")}\n${after}`;
-        }
-      );
+        const newRaw = result.raw.replace(
+          regex,
+          (match, before, capture, after) => {
+            return `${before}\n${this.attrs.checkedUsers.join("\n")}\n${after}`;
+          }
+        );
 
-      return cookAsync(newRaw).then(cooked =>
-        post.save({
-          cooked: cooked.string,
-          raw: newRaw,
-          edit_reason: I18n.t(themePrefix("edit_reason"))
-        })
-      );
-    }).finally(() => this.state.isLoading = false)
+        return cookAsync(newRaw).then(cooked =>
+          post.save({
+            cooked: cooked.string,
+            raw: newRaw,
+            edit_reason: I18n.t(themePrefix("edit_reason"))
+          })
+        );
+      })
+      .finally(() => (this.state.isLoading = false));
   },
 
   template: hbs`
@@ -95,11 +103,12 @@ export default createWidget("discourse-group-checklist", {
         <thead>
           <tr>
             <th>
-              {{#if this.attrs.title}}
               <h3 class="discourse-group-checklist-title">
-                {{this.attrs.title}}
+                {{#if this.attrs.title}}
+                  <span>{{attrs.title}}</span>
+                {{/if}}
+                <span>{{attrs.checkedUsers.length}}/{{transformed.users.length}}</span>
               </h3>
-              {{/if}}
             </th>
             <th></th>
             <th>

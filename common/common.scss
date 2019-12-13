@@ -30,6 +30,10 @@
   }
 
   .discourse-group-checklist-user {
+    &.is-current-user {
+      background: $primary-very-low;
+    }
+
     .discourse-group-checklist-user-avatar {
       .discourse-group-checklist-username {
         margin-left: 0.5em;

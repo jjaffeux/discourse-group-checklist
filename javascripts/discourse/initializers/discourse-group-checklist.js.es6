@@ -50,22 +50,36 @@ export default {
         }
 
         $groupChecklists.each((idx, groupChecklist) => {
-          const checkedUsers = groupChecklist.innerText.split("\n").filter(Boolean);
+          const checkedUsers = groupChecklist.innerText
+            .split("\n")
+            .filter(Boolean);
 
-          const identifier = escapeExpression(groupChecklist.getAttribute("data-identifier"));
+          const identifier = escapeExpression(
+            groupChecklist.getAttribute("data-identifier")
+          );
           if (!identifier) {
             console.error("[identifier] attribute is mandatory.");
           }
 
-          const group = escapeExpression(groupChecklist.getAttribute("data-group"));
+          const group = escapeExpression(
+            groupChecklist.getAttribute("data-group")
+          );
           if (!group) {
             console.error("[group] attribute is mandatory.");
           }
 
-          const title = escapeExpression(groupChecklist.getAttribute("data-title"));
+          const title = escapeExpression(
+            groupChecklist.getAttribute("data-title")
+          );
+
+          const choices = escapeExpression(
+            groupChecklist
+              .getAttribute("data-choices")
+              .split(",")
+              .filter(Boolean)
+          );
 
           groupChecklist.innerHTML = "<div class='spinner'></div>";
-
           _loadGroupMembers(group).then(members => {
             _attachWidget(api, groupChecklist, {
               id: `${id}-${idx}`,
@@ -73,7 +87,9 @@ export default {
               post,
               checkedUsers,
               members,
-              title
+              title,
+              currentUsername: api.getCurrentUser().get("username"),
+              choices
             });
           });
         });
