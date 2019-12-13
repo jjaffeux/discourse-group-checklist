@@ -51,6 +51,12 @@
 .mobile-view {
   .d-wrap[data-wrap="group-checklist"],
   .discourse-group-checklist {
+    .discourse-group-checklist-user {
+      .description {
+        display: none
+      }
+    }
+
     .discourse-group-checklist-filter {
       display: none;
     }
