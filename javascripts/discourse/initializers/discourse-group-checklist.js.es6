@@ -49,8 +49,9 @@ export default {
           return;
         }
 
-        const checkedUsers = [];
+
         $groupChecklists.each((idx, groupChecklist) => {
+          const checkedUsers = [];
           groupChecklist.querySelectorAll("tbody tr").forEach(tr => {
             const checkedUser = {};
             tr.querySelectorAll("td").forEach((td, index) => {
@@ -101,13 +102,14 @@ export default {
             .map(choice => escapeExpression(choice));
 
           groupChecklist.innerHTML = "<div class='spinner'></div>";
+
           _loadGroupMembers(group).then(members => {
             _attachWidget(api, groupChecklist, {
-              id: `${id}-${idx}`,
+              id: `${id}-${idx}-${identifier}`,
               identifier,
               post,
               checkedUsers,
-              members,
+              members: JSON.parse(JSON.stringify(members)),
               title,
               currentUsername: api.getCurrentUser().get("username"),
               choices
