@@ -6,7 +6,7 @@ import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 
 export default {
-  name: "discourse-group-timezones",
+  name: "discourse-group-checklist",
 
   initialize() {
     withPluginApi("0.8.7", api => {
