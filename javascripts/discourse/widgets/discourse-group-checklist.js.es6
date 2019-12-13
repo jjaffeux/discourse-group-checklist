@@ -37,6 +37,7 @@ export default createWidget("discourse-group-checklist", {
         }
       })
       .filter(Boolean)
+      .sortBy("username")
       .sort((a, b) => {
         if (a._currentUser) return -10;
         if (b._currentUser) return 1;
