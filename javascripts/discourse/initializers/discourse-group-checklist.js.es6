@@ -59,6 +59,13 @@ export default {
           );
           if (!identifier) {
             console.error("[identifier] attribute is mandatory.");
+            return;
+          }
+
+          const identifiers = $elem[0].querySelectorAll(`.d-wrap[data-wrap=group-checklist][data-identifier=${identifier}]`);
+          if (identifiers && identifiers.length > 1) {
+            console.error("[identifier] should be unique.");
+            return;
           }
 
           const group = escapeExpression(
@@ -66,17 +73,17 @@ export default {
           );
           if (!group) {
             console.error("[group] attribute is mandatory.");
+            return;
           }
 
           const title = escapeExpression(
             groupChecklist.getAttribute("data-title")
           );
 
-          const choices = escapeExpression(
-            (groupChecklist.getAttribute("data-choices") || "")
-              .split(",")
-              .filter(Boolean)
-          );
+          const choices = (groupChecklist.getAttribute("data-choices") || "")
+            .split(",")
+            .filter(Boolean)
+            .map(choice => escapeExpression(choice));
 
           groupChecklist.innerHTML = "<div class='spinner'></div>";
           _loadGroupMembers(group).then(members => {

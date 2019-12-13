@@ -11,13 +11,18 @@ export default createWidget("discourse-group-checklist-user", {
 
   buildClasses(attrs) {
     if (attrs.user._currentUser) {
-      return "is-current-user"
+      return "is-current-user";
     }
   },
 
   html(attrs) {
-    const { name, username, avatar_template, _checked, _currentUser
- } = attrs.user;
+    const {
+      name,
+      username,
+      avatar_template,
+      _checked,
+      _currentUser
+    } = attrs.user;
 
     const userNode = h(
       "a",
@@ -32,26 +37,36 @@ export default createWidget("discourse-group-checklist-user", {
           template: avatar_template,
           username: name || formatUsername(username)
         }),
-        h("span.discourse-group-checklist-username", name || formatUsername(username))
+        h(
+          "span.discourse-group-checklist-username",
+          name || formatUsername(username)
+        )
       ]
     );
 
-    const classNames = []
+    const classNames = [];
     if (_checked) {
       classNames.push("is-checked");
     }
 
-    const checkedButton = this.attach("button", {
-      className: classNames.join(" "),
-      icon: _checked ? "check-square" : "far-square",
-      action: "toggleUser",
-      actionParam: attrs.user
-    });
+    let actionComponent;
+    if (this.attrs.choices.length) {
+      actionComponent = this.attach(
+        "discourse-group-checklist-select",
+        {
+          user: this.attrs.user,
+          choices: this.attrs.choices
+        }
+      );
+    } else {
+      actionComponent = this.attach("button", {
+        className: classNames.join(" "),
+        icon: _checked ? "check-square" : "far-square",
+        action: "toggleUser",
+        actionParam: attrs.user
+      });
+    }
 
-    return [
-      h("td", [userNode]),
-      h("td", [checkedButton]),
-      h("td")
-    ];
+    return [h("td.user", [userNode]), h("td", [actionComponent]), h("td")];
   }
 });

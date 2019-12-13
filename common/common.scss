@@ -5,8 +5,12 @@
   overflow-y: auto;
 
   table {
-    table-layout: fixed ;
+    table-layout: fixed;
     width: 100% ;
+
+    select {
+      margin: 0;
+    }
 
     thead {
       margin: 0.5em;
@@ -31,12 +35,34 @@
 
   .discourse-group-checklist-user {
     &.is-current-user {
-      background: $primary-very-low;
+      background: $primary-low;
     }
 
     .discourse-group-checklist-user-avatar {
       .discourse-group-checklist-username {
         margin-left: 0.5em;
+      }
+    }
+  }
+}
+
+
+.mobile-view {
+  .d-wrap[data-wrap="group-checklist"],
+  .discourse-group-checklist {
+    .discourse-group-checklist-filter {
+      display: none;
+    }
+
+    table {
+      table-layout: auto;
+
+      select {
+        width: 120px;
+      }
+
+      .user {
+        width: 100%;
       }
     }
   }

@@ -11,7 +11,17 @@ export default createWidget("discourse-group-checklist", {
   transform(attrs) {
     const users = attrs.members
       .map(member => {
-        member._checked = attrs.checkedUsers.includes(member.username);
+        const checkedUser = attrs.checkedUsers.find(
+          u => u.indexOf(member.username) === 0
+        );
+        member._checked = checkedUser;
+
+        if (checkedUser) {
+          const value = checkedUser.split("|");
+
+          if (value && value[1]) member._value = value[1];
+        }
+
         member._currentUser = attrs.currentUsername === member.username;
         return member;
       })
@@ -49,7 +59,48 @@ export default createWidget("discourse-group-checklist", {
     this.state.filter = filter && filter.length ? filter : null;
   },
 
+  onChangeSelect(data) {
+    const checkedUser = this.attrs.checkedUsers.find(
+      u => u.indexOf(data.username) === 0
+    );
+
+    console.log(data, checkedUser)
+
+    if (!data.value && checkedUser) {
+      this.attrs.checkedUsers.removeObject(checkedUser);
+    } else {
+      const payload = [data.username, data.value].filter(Boolean);
+      if (checkedUser) {
+        const index = this.attrs.checkedUsers.indexOf(checkedUser);
+        this.attrs.checkedUsers.replace(index, 1, [payload.join("|")]);
+      } else {
+
+        this.attrs.checkedUsers.pushObject(payload.join("|"));
+      }
+    }
+
+    this._update();
+  },
+
   toggleUser(user) {
+    const checkedUser = this.attrs.checkedUsers.find(
+      u => u.indexOf(user.username) === 0
+    );
+
+    if (checkedUser) {
+      this.attrs.checkedUsers.removeObject(checkedUser);
+    } else {
+      const payload = [user.username];
+      if (user._value) {
+        payload.push(user._value);
+      }
+      this.attrs.checkedUsers.pushObject(payload.join("|"));
+    }
+
+    this._update();
+  },
+
+  _update() {
     const post = this.attrs.post;
 
     if (!post) {
@@ -61,12 +112,6 @@ export default createWidget("discourse-group-checklist", {
     }
 
     this.state.isLoading = true;
-
-    if (this.attrs.checkedUsers.includes(user.username)) {
-      this.attrs.checkedUsers.removeObject(user.username);
-    } else {
-      this.attrs.checkedUsers.pushObject(user.username);
-    }
 
     ajax(`/posts/${post.id}`, { type: "GET", cache: false })
       .then(result => {
@@ -122,6 +167,7 @@ export default createWidget("discourse-group-checklist", {
               widget="discourse-group-checklist-user"
               attrs=(hash
                 user=user
+                choices=attrs.choices
               )
             }}
           {{/each}}
