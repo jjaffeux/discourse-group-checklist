@@ -137,7 +137,7 @@ export default createWidget("discourse-group-checklist", {
                 {{#if this.attrs.title}}
                   <span>{{attrs.title}}</span>
                 {{/if}}
-                <span>{{attrs.checkedUsers.length}}/{{transformed.users.length}}</span>
+                <span>{{transformed.users.length}}/{{attrs.checkedUsers.length}}</span>
               </h3>
             </th>
             <th></th>
